@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSC Restaurant</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        background: #f5f6fa;
+        padding: 20px;
+    }
+
+    h1.main-title {
+        text-align: center;
+        color: #ff6b00;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+
+    .tab-bar {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        padding: 10px 22px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        background: white;
+        color: #555;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+        position: relative;
+    }
+
+    .tab-btn:hover {
+        border-color: #ff6b00;
+        color: #ff6b00;
+    }
+
+    .tab-btn.active {
+        background: #ff6b00;
+        color: white;
+        border-color: #ff6b00;
+    }
+
+    .tab-btn .badge {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .page {
+        display: none;
+    }
+
+    .page.active {
+        display: block;
+    }
+
+
+    .section-heading {
+        grid-column: 1 / -1;
+        color: #ff6b00;
+        font-size: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 14px 0 6px;
+        border-bottom: 2px solid #ff6b00;
+        margin-bottom: 4px;
+    }
+
+    #menuGrid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .menu-card {
+        background: white;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .07);
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        transition: .25s;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .menu-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .item-name {
+        margin-top: 9px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .item-price {
+        margin-top: 4px;
+        color: #ff6b00;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    input[type="number"] {
+        width: 100%;
+        padding: 7px;
+        margin-top: 9px;
+        border: 1px solid #ccc;
+        border-radius: 7px;
+        outline: none;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .buy-btn {
+        margin-top: 9px;
+        padding: 9px;
+        border: none;
+        border-radius: 7px;
+        background: #28a745;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .buy-btn:hover {
+        background: #218838;
+    }
+
+
+    .menu-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .menu-header label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    #menuTableSelect {
+        padding: 8px 14px;
+        border: 2px solid #ff6b00;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #ff6b00;
+        outline: none;
+        cursor: pointer;
+        background: white;
+    }
+
+
+    .dashboard-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 18px;
+    }
+
+    .tables-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .07);
+    }
+
+    .table-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .table-card-header h3 {
+        color: #ff6b00;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .table-status {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 20px;
+    }
+
+    .table-status.empty {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .table-status.active {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .order-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 6px 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 13px;
+    }
+
+    .order-item-row:last-child {
+        border-bottom: none;
+    }
+
+    .order-item-left {
+        flex: 1;
+    }
+
+    .order-item-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .order-item-time {
+        font-size: 11px;
+        color: #999;
+        margin-top: 2px;
+    }
+
+    .order-item-amount {
+        font-weight: 700;
+        color: #ff6b00;
+        white-space: nowrap;
+    }
+
+    .table-total {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 2px solid #ff6b00;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .table-total span:last-child {
+        color: #ff6b00;
+    }
+
+    .empty-table-msg {
+        color: #bbb;
+        font-size: 13px;
+        text-align: center;
+        padding: 16px 0;
+    }
+
+    .clear-table-btn {
+        margin-top: 12px;
+        width: 100%;
+        padding: 8px;
+        background: #ffeaea;
+        color: #e74c3c;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .clear-table-btn:hover {
+        background: #e74c3c;
+        color: white;
+    }
+
+
+    .bill-select-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .bill-select-bar label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    #billTableSelect {
+        padding: 8px 14px;
+        border: 2px solid #ff6b00;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #ff6b00;
+        outline: none;
+        cursor: pointer;
+        background: white;
+    }
+
+    .bill-box {
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .07);
+        max-width: 520px;
+    }
+
+    .bill-header {
+        text-align: center;
+        margin-bottom: 18px;
+    }
+
+    .bill-header h2 {
+        color: #ff6b00;
+        font-size: 22px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .bill-header p {
+        color: #999;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .bill-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .bill-table th {
+        background: #222;
+        color: white;
+        padding: 9px 12px;
+        text-align: left;
+    }
+
+    .bill-table td {
+        padding: 9px 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .bill-table .time-cell {
+        font-size: 11px;
+        color: #999;
+    }
+
+    .bill-grand {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 3px solid #ff6b00;
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .bill-grand span:last-child {
+        color: #ff6b00;
+    }
+
+    .print-btn {
+        margin-top: 16px;
+        width: 100%;
+        padding: 12px;
+        background: #ff6b00;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .print-btn:hover {
+        background: #e05f00;
+    }
+
+    .settle-btn {
+        margin-top: 8px;
+        width: 100%;
+        padding: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .settle-btn:hover {
+        background: #218838;
+    }
+
+
+    #toast {
+        position: fixed;
+        bottom: 26px;
+        right: 26px;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity .3s;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    #toast.show {
+        opacity: 1;
+    }
+
+
+    @media(max-width:1100px) {
+        #menuGrid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .tables-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media(max-width:800px) {
+        #menuGrid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .tables-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media(max-width:550px) {
+        #menuGrid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media(max-width:380px) {
+        #menuGrid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<body>
+    <h1 class="main-title">🍽️ CSC Restaurant</h1>
+
+
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="showPage('menu')">📋 Menu</button>
+        <button class="tab-btn" onclick="showPage('dashboard')" id="dashBtn">
+            📊 All Tables
+            <span class="badge" id="activeCount" style="display:none"></span>
+        </button>
+        <button class="tab-btn" onclick="showPage('bill')">🧾 Bill</button>
+    </div>
+
+    <div class="page active" id="page-menu">
+
+        <div class="menu-header">
+            <label for="menuTableSelect">Ordering for:</label>
+            <select id="menuTableSelect">
+                <option value="1">Table 1</option>
+                <option value="2">Table 2</option>
+                <option value="3">Table 3</option>
+                <option value="4">Table 4</option>
+                <option value="5">Table 5</option>
+            </select>
+        </div>
+
+        <div id="menuGrid">
+            <div class="section-heading">🌅 Morning Items</div>
+
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3-QWp1IaMXJV65sx1YDqEhDgTWO_Ze7tXScqM857VX3xqT73ynsRVkL4L&s=10"
+                    alt="Dosa">
+                <p class="item-name">Dosa</p>
+                <p class="item-price">₹25</p>
+                <input type="number" id="dosa" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('dosa','Dosa',25)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnrJr9VD_lMcu8_K60RzQt38avTgMsRzyj8kZ7nBmttQ&s=10"
+                    alt="Idly">
+                <p class="item-name">Idly</p>
+                <p class="item-price">₹10</p>
+                <input type="number" id="idly" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('idly','Idly',10)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvh_89xj-_sNFyhHfbqOERvCFLAHQvYUGIupsh594shg&s=10"
+                    alt="Vadai">
+                <p class="item-name">Vadai</p>
+                <p class="item-price">₹10</p>
+                <input type="number" id="vadai" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('vadai','Vadai',10)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvh_89xj-_sNFyhHfbqOERvCFLAHQvYUGIupsh594shg&s=10"
+                    alt="Poori">
+                <p class="item-name">Poori</p>
+                <p class="item-price">₹40</p>
+                <input type="number" id="poori" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('poori','Poori',40)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT32u-WyB_pnRETXtAebDFlENadNwAKWfyDRU-HghQ2IQ&s=10"
+                    alt="Pongal">
+                <p class="item-name">Pongal</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="pongal" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('pongal','Pongal',50)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWMoeoxOQTdbs1AvFGqdrIOm9WJAfaq2TTaNgdU0SoHg&s=10"
+                    alt="Pasta">
+                <p class="item-name">Pasta</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="pasta" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('pasta','Pasta',100)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3-QWp1IaMXJV65sx1YDqEhDgTWO_Ze7tXScqM857VX3xqT73ynsRVkL4L&s=10"
+                    alt="Egg Dosa">
+                <p class="item-name">Egg Dosa</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="egg_dosa" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('egg_dosa','Egg Dosa',50)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVUSi3kv3y-BQuISrIOzKczhNy7MnttCQIJbQoV8kEWQ&s=10"
+                    alt="Masala Dosa">
+                <p class="item-name">Masala Dosa</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="masala_dosa" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('masala_dosa','Masala Dosa',50)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUhw-HHozX7XejUwMReRSzFp4J-bQQvPtc37sqcZy8Hg&s=10"
+                    alt="Roast Dosa">
+                <p class="item-name">Roast Dosa</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="roast_dosa" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('roast_dosa','Roast Dosa',50)">Add to Order</button>
+            </div>
+
+            <div class="section-heading">☀️ Afternoon Items</div>
+
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVYeY-G7kCyO48WIH4-nACEMvkxGtQVQoYGdQWZxt17w&s=10"
+                    alt="Chicken Curry">
+                <p class="item-name">Chicken Curry</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="chicken_curry" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chicken_curry','Chicken Curry',50)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCLCMBqpPbGixWKafeh4aLsKpnUUGImPgc4YpeLwtTog&s=10"
+                    alt="Chicken 65">
+                <p class="item-name">Chicken 65</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="chicken_65" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chicken_65','Chicken 65',100)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjIoiOYjatQrceVponOH83afZKdT1yVZoo0WJBdG0HoA&s=10"
+                    alt="Chicken 65 Gravy">
+                <p class="item-name">Chicken 65 Gravy</p>
+                <p class="item-price">₹200</p>
+                <input type="number" id="chicken_65_gravy" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chicken_65_gravy','Chicken 65 Gravy',200)">Add to
+                    Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyfWMev0LF-wBu9eftOi6ivMC83E9ngzBVcEe6xhYRQQ&s=10"
+                    alt="Mutton Biryani">
+                <p class="item-name">Mutton Biryani</p>
+                <p class="item-price">₹200</p>
+                <input type="number" id="mutton_biryani" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('mutton_biryani','Mutton Biryani',200)">Add to
+                    Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFLw_bSMIb9SOXs7DBMcY62-VHWCTZNHZeM5hWO4cpoQ&s=10"
+                    alt="Chicken Biryani">
+                <p class="item-name">Chicken Biryani</p>
+                <p class="item-price">₹200</p>
+                <input type="number" id="chicken_biryani" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chicken_biryani','Chicken Biryani',200)">Add to
+                    Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvwvDvWdutcaU_8Wb3snBP-21apdUmbfs3bhcFS9HUxw&s=10"
+                    alt="Fish Biryani">
+                <p class="item-name">Fish Biryani</p>
+                <p class="item-price">₹200</p>
+                <input type="number" id="fish_biryani" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('fish_biryani','Fish Biryani',200)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cPEITDgsEFQxymdvyxk13VihBZXSBxU517LDS34nMg&s=10"
+                    alt="Prawns Biryani">
+                <p class="item-name">Prawns Biryani</p>
+                <p class="item-price">₹200</p>
+                <input type="number" id="prawns_biryani" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('prawns_biryani','Prawns Biryani',200)">Add to
+                    Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVYeY-G7kCyO48WIH4-nACEMvkxGtQVQoYGdQWZxt17w&s=10"
+                    alt="Curd Rice">
+                <p class="item-name">Curd Rice</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="curd_rice" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('curd_rice','Curd Rice',100)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRySpzSPOF_zv_1jK8w9sl0x1avvQ5h9_vaPIiVdkV0Q&s=10"
+                    alt="Tomato Rice">
+                <p class="item-name">Tomato Rice</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="tomato_rice" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('tomato_rice','Tomato Rice',100)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1144gRLC0xNkxTnEU9Z4rlWuAo0_MarSWN6hImdZk0Q&s=10"
+                    alt="Lemon Rice">
+                <p class="item-name">Lemon Rice</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="lemon_rice" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('lemon_rice','Lemon Rice',100)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOP7bONRNDwFenEy6FwL0jbi1hWRhXL6eD86OdCRmiJA&s=10"
+                    alt="Chilli Rice">
+                <p class="item-name">Chilli Rice</p>
+                <p class="item-price">₹100</p>
+                <input type="number" id="chilli_rice" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chilli_rice','Chilli Rice',100)">Add to Order</button>
+            </div>
+
+            <div class="section-heading">🌙 Dinner Items</div>
+
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRgD8eM-9h0KjYf1EP1t1SI-aaeCAi6E0J26Rgz0lo9g&s=10"
+                    alt="Idiyappam">
+                <p class="item-name">Idiyappam</p>
+                <p class="item-price">₹25</p>
+                <input type="number" id="idiyappam" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('idiyappam','Idiyappam',25)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXg9EmgUKwa-nqM8gb9BwHRUzL8Hnrb4UV8UmdL9wVIw&s=10"
+                    alt="Chapatis">
+                <p class="item-name">Chapatis</p>
+                <p class="item-price">₹30</p>
+                <input type="number" id="chapatis" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chapatis','Chapatis',30)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz8y0aFgaGlFR4tjUoFmrzND1Ulydmd_08Q67XHfyeew&s=10"
+                    alt="Parotta">
+                <p class="item-name">Parotta</p>
+                <p class="item-price">₹20</p>
+                <input type="number" id="parotta" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('parotta','Parotta',20)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBu5UNw9YAJp4Mfw8FXAl4XrJQFp3F5vPZBlwIkYKdCQ&s=10"
+                    alt="Chilli Parotta">
+                <p class="item-name">Chilli Parotta</p>
+                <p class="item-price">₹80</p>
+                <input type="number" id="chilli_parotta" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('chilli_parotta','Chilli Parotta',80)">Add to Order</button>
+            </div>
+            <div class="menu-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ9KrKkkWjks7QK79B1awFvdtNyBxE-Bele8ET7qE2iA&s=10"
+                    alt="Nool Porotta">
+                <p class="item-name">Nool Porotta</p>
+                <p class="item-price">₹50</p>
+                <input type="number" id="nool_porotta" min="1" value="1">
+                <button class="buy-btn" onclick="addToOrder('nool_porotta','Nool Porotta',50)">Add to Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="page-dashboard">
+        <p class="dashboard-title">📊 All Tables — Live Overview</p>
+        <div class="tables-grid" id="tablesGrid"></div>
+    </div>
+
+
+
+    <div class="page" id="page-bill">
+        <div class="bill-select-bar">
+            <label for="billTableSelect">Select Table:</label>
+            <select id="billTableSelect" onchange="renderBill()">
+                <option value="1">Table 1</option>
+                <option value="2">Table 2</option>
+                <option value="3">Table 3</option>
+                <option value="4">Table 4</option>
+                <option value="5">Table 5</option>
+            </select>
+        </div>
+        <div class="bill-box">
+            <div class="bill-header">
+                <h2>🍽️ CSC Restaurant</h2>
+                <p id="billTableLabel">Table 1</p>
+                <p id="billDateTime" style="font-size:12px;color:#aaa;margin-top:2px;"></p>
+            </div>
+            <div id="billContent"></div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+
+        const tableOrders = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+        function nowTime() {
+            return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+
+        function addToOrder(inputId, itemName, priceEach) {
+            const qty = parseInt(document.getElementById(inputId).value);
+            if (!qty || qty < 1) { showToast('Enter a valid quantity!', '#e74c3c'); return; }
+
+            const tableNum = parseInt(document.getElementById('menuTableSelect').value);
+            const total = qty * priceEach;
+            const time = nowTime();
+
+            tableOrders[tableNum].push({ id: inputId + '_' + Date.now(), name: itemName, qty, priceEach, total, time });
+
+            document.getElementById(inputId).value = 1;
+            updateBadge();
+            showToast(`Table ${tableNum}: ${itemName} x${qty} added at ${time}`, '#28a745');
+        }
+
+
+        function removeItem(tableNum, itemId) {
+            tableOrders[tableNum] = tableOrders[tableNum].filter(i => i.id !== itemId);
+            renderDashboard();
+            updateBadge();
+        }
+
+
+        function clearTable(tableNum) {
+            if (!confirm(`Clear all orders for Table ${tableNum}?`)) return;
+            tableOrders[tableNum] = [];
+            renderDashboard();
+            updateBadge();
+            showToast(`Table ${tableNum} cleared.`, '#888');
+        }
+
+
+        function updateBadge() {
+            const active = Object.values(tableOrders).filter(t => t.length > 0).length;
+            const badge = document.getElementById('activeCount');
+            if (active > 0) { badge.style.display = 'flex'; badge.textContent = active; }
+            else { badge.style.display = 'none'; }
+        }
+
+
+        function showPage(name) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('page-' + name).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (name === 'dashboard') renderDashboard();
+            if (name === 'bill') renderBill();
+        }
+
+
+        function renderDashboard() {
+            const grid = document.getElementById('tablesGrid');
+            grid.innerHTML = '';
+
+            [1, 2, 3, 4, 5].forEach(t => {
+                const items = tableOrders[t];
+                const total = items.reduce((s, i) => s + i.total, 0);
+                const hasOrders = items.length > 0;
+
+                const card = document.createElement('div');
+                card.className = 'table-card';
+
+                let rowsHTML = '';
+                if (!hasOrders) {
+                    rowsHTML = '<p class="empty-table-msg">No orders yet</p>';
+                } else {
+                    rowsHTML = items.map(item => `
+                <div class="order-item-row">
+                    <div class="order-item-left">
+                        <div class="order-item-name">${item.name} × ${item.qty}</div>
+                        <div class="order-item-time">🕐 ${item.time}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="order-item-amount">₹${item.total}</span>
+                        <button onclick="removeItem(${t},'${item.id}')"
+                            style="background:#ffeaea;color:#e74c3c;border:none;border-radius:6px;
+                                   width:24px;height:24px;cursor:pointer;font-size:14px;line-height:1;">✕</button>
+                    </div>
+                </div>`).join('');
+                }
+
+                card.innerHTML = `
+            <div class="table-card-header">
+                <h3>Table ${t}</h3>
+                <span class="table-status ${hasOrders ? 'active' : 'empty'}">
+                    ${hasOrders ? items.length + ' item' + (items.length > 1 ? 's' : '') : 'Free'}
+                </span>
+            </div>
+            ${rowsHTML}
+            ${hasOrders ? `
+            <div class="table-total"><span>Total</span><span>₹${total}</span></div>
+            <button class="clear-table-btn" onclick="clearTable(${t})">🗑 Clear Table ${t}</button>
+            ` : ''}
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+
+        function renderBill() {
+            const t = parseInt(document.getElementById('billTableSelect').value);
+            const items = tableOrders[t];
+            const total = items.reduce((s, i) => s + i.total, 0);
+
+            document.getElementById('billTableLabel').textContent = 'Table ' + t;
+            document.getElementById('billDateTime').textContent =
+                new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) +
+                '  |  Generated: ' + nowTime();
+
+            const content = document.getElementById('billContent');
+
+            if (items.length === 0) {
+                content.innerHTML = '<p style="text-align:center;color:#bbb;padding:20px;">No orders for Table ' + t + '</p>';
+                return;
+            }
+
+            const rows = items.map((item, i) => `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>₹${item.priceEach}</td>
+            <td>₹${item.total}</td>
+            <td class="time-cell">${item.time}</td>
+        </tr>`).join('');
+
+            content.innerHTML = `
+        <table class="bill-table">
+            <thead><tr>
+                <th>#</th><th>Item</th><th>Qty</th>
+                <th>Rate</th><th>Amount</th><th>Time</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <div class="bill-grand"><span>Grand Total</span><span>₹${total}</span></div>
+        <button class="print-btn" onclick="window.print()">🖨️ Print Bill</button>
+        <button class="settle-btn" onclick="settleTable(${t})">✅ Settle & Clear Table ${t}</button>
+    `;
+        }
+
+        function settleTable(t) {
+            if (!confirm('Mark Table ' + t + ' as settled and clear all orders?')) return;
+            tableOrders[t] = [];
+            updateBadge();
+            renderBill();
+            showToast('Table ' + t + ' settled!', '#28a745');
+        }
+
+
+        function showToast(msg, color) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = color || '#28a745';
+            toast.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+    </script>
+</body>
+
+</html>
